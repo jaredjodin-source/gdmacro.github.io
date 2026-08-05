@@ -5,56 +5,205 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Coffre à Macros GD</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: #0f111a; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
-    .container { width: 100%; max-width: 650px; }
-    .card { background-color: #1a1d2e; border: 2px solid #2a2f4c; border-radius: 12px; padding: 25px; margin-bottom: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; }
-    
-    .admin-btn { position: absolute; top: 15px; right: 15px; background: #2a2f4c; color: #a0a5c0; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: 0.2s; }
-    .admin-btn:hover { background: #3a4168; color: #fff; }
-    .admin-badge { display: none; background: #ff4d4d; color: #fff; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; margin-left: 5px; font-weight: bold; }
-    
-    h1 { color: #00d2ff; margin-bottom: 8px; font-size: 1.8rem; }
-    h2 { color: #00d2ff; font-size: 1.2rem; margin-bottom: 15px; text-align: left; }
-    p { color: #a0a5c0; margin-bottom: 20px; font-size: 0.95rem; }
-    
-    .drop-zone { border: 2px dashed #00d2ff; border-radius: 8px; padding: 35px 20px; background-color: rgba(0, 210, 255, 0.05); cursor: pointer; transition: 0.2s; }
-    .drop-zone:hover, .drop-zone.dragover { background-color: rgba(0, 210, 255, 0.15); border-color: #3a7bd5; }
-    .drop-zone p { color: #d0d5f0; margin: 0; font-weight: 500; }
-    
-    .allowed-tags { display: flex; gap: 8px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
-    .tag { background: #2a2f4c; color: #00d2ff; font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; font-weight: bold; }
-    
-    #file-input { display: none; }
-    #status-msg { margin-top: 15px; font-weight: bold; font-size: 0.95rem; }
-    .success { color: #00ff88; }
-    .error { color: #ff4d4d; }
-    
-    .publish-btn { display: inline-block; margin-top: 15px; background: #00d2ff; color: #000; font-weight: bold; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; transition: 0.2s; }
-    .publish-btn:hover { background: #00a2c7; }
+    :root {
+      --bg-color: #0b0c10;
+      --card-bg: #1f2833;
+      --accent: #66fcf1;
+      --accent-hover: #45c4b9;
+      --text-main: #ffffff;
+      --text-muted: #c5c6c7;
+      --danger: #ff4757;
+      --border: #2c3542;
+    }
 
-    .macro-list { text-align: left; }
-    .macro-item { display: flex; justify-content: space-between; align-items: center; background: #121420; padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #2a2f4c; }
-    .macro-info { display: flex; align-items: center; gap: 10px; }
-    .macro-name { font-weight: bold; font-size: 0.9rem; color: #ffffff; }
-    .macro-ext { background: #00d2ff; color: #000; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
-    .download-btn { background: #00ff88; color: #000; text-decoration: none; font-size: 0.8rem; font-weight: bold; padding: 6px 12px; border-radius: 6px; transition: 0.2s; }
-    .download-btn:hover { background: #00cc6a; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      background-image: radial-gradient(circle at 50% 10%, #172a45 0%, var(--bg-color) 70%);
+    }
+
+    .container { width: 100%; max-width: 700px; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: var(--accent);
+      text-shadow: 0 0 10px rgba(102, 252, 241, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .admin-badge {
+      display: none;
+      background: var(--danger);
+      color: white;
+      font-size: 0.65rem;
+      padding: 3px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .login-btn {
+      background: var(--card-bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+    .login-btn:hover { background: var(--border); color: var(--text-main); }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    }
+
+    h2 { color: var(--accent); font-size: 1.2rem; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+    p { color: var(--text-muted); margin-bottom: 15px; font-size: 0.95rem; }
+
+    /* Zone de dépôt */
+    .drop-zone {
+      border: 2px dashed var(--accent);
+      border-radius: 10px;
+      padding: 30px 20px;
+      background-color: rgba(102, 252, 241, 0.03);
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      background-color: rgba(102, 252, 241, 0.08);
+      border-color: #ffffff;
+    }
+    .drop-zone p { color: var(--text-main); margin: 0; font-weight: 500; }
+
+    .allowed-tags { display: flex; gap: 6px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+    .tag { background: #0b0c10; color: var(--accent); font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; font-weight: bold; border: 1px solid var(--border); }
+
+    #file-input { display: none; }
+    #status-msg { margin-top: 12px; font-weight: bold; font-size: 0.9rem; text-align: center; }
+    .success { color: #2ecc71; }
+    .error { color: var(--danger); }
+
+    .action-btn {
+      display: block;
+      width: 100%;
+      margin-top: 15px;
+      background: var(--accent);
+      color: #0b0c10;
+      font-weight: bold;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .action-btn:hover { background: var(--accent-hover); }
+
+    /* Barre de recherche et filtres */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 180px;
+      background: #0b0c10;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: white;
+      font-size: 0.9rem;
+    }
+    .search-input:focus { outline: none; border-color: var(--accent); }
+
+    .filter-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+    .chip {
+      background: #0b0c10;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.2s;
+    }
+    .chip.active, .chip:hover { background: var(--accent); color: #0b0c10; border-color: var(--accent); font-weight: bold; }
+
+    /* Liste des macros */
+    .macro-list { display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 2px; }
+    .macro-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0b0c10;
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      transition: 0.2s;
+    }
+    .macro-item:hover { border-color: rgba(102, 252, 241, 0.4); }
+    .macro-info { display: flex; align-items: center; gap: 12px; }
+    .macro-ext { background: var(--accent); color: #0b0c10; font-size: 0.7rem; font-weight: bold; padding: 3px 7px; border-radius: 5px; text-transform: uppercase; }
+    .macro-name { font-weight: 600; font-size: 0.95rem; color: #fff; word-break: break-all; }
+    
+    .macro-actions { display: flex; gap: 8px; align-items: center; }
+    .download-btn { background: #2ecc71; color: #0b0c10; text-decoration: none; font-size: 0.8rem; font-weight: bold; padding: 6px 14px; border-radius: 6px; transition: 0.2s; }
+    .download-btn:hover { background: #27ae60; }
+    .delete-btn { background: var(--danger); color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; display: none; }
+    .delete-btn:hover { background: #c0392b; }
+
+    /* Panneau Admin (caché par défaut) */
+    #admin-panel { display: none; border-left: 4px solid var(--danger); }
   </style>
 </head>
 <body>
 
   <div class="container">
     
+    <header>
+      <h1>📦 Coffre à Macros GD <span class="admin-badge" id="admin-badge">Admin</span></h1>
+      <button class="login-btn" id="login-btn">🔑 Connexion</button>
+    </header>
+
+    <!-- Section Dépôt / Proposition -->
     <div class="card">
-      <button class="admin-btn" id="login-btn">🔑 Connexion</button>
-      
-      <h1>Coffre à Macros GD <span class="admin-badge" id="admin-badge">PROPRIÉTAIRE</span></h1>
-      <p id="sub-title">Dépose tes macros Geometry Dash ici pour les partager à la communauté !</p>
+      <h2>Partager une Macro</h2>
+      <p id="sub-title">Sélectionne ton fichier macro Geometry Dash pour le soumettre.</p>
       
       <div class="drop-zone" id="drop-zone">
-        <p id="drop-text">Glisse ton fichier macro ici ou <strong>clique pour parcourir</strong></p>
-        <div class="allowed-tags" id="tag-container">
+        <p>Clique ici ou glisse ton fichier macro</p>
+        <div class="allowed-tags">
           <span class="tag">.gdr</span>
           <span class="tag">.gdr2</span>
           <span class="tag">.echo</span>
@@ -63,17 +212,45 @@
         </div>
       </div>
       
-      <input type="file" id="file-input" multiple>
-      
+      <input type="file" id="file-input">
       <div id="status-msg"></div>
+      
       <div id="publish-container" style="display: none;">
-        <a id="publish-link" target="_blank" class="publish-btn">🚀 Soumettre cette macro pour tout le monde</a>
+        <a id="publish-link" target="_blank" class="action-btn">🚀 Ouvrir GitHub pour envoyer la macro</a>
       </div>
     </div>
 
-    <div class="card macro-list">
-      <h2>🌍 Macros Téléchargeables par Tout le Monde</h2>
-      <div id="macro-container"></div>
+    <!-- Panneau Réservé à l'Admin (Ajout rapide direct) -->
+    <div class="card" id="admin-panel">
+      <h2>🛠️ Panneau Propriétaire (Ajout Rapide)</h2>
+      <p>En tant qu'admin, tu peux ajouter directement une macro au site sans passer par GitHub Issues :</p>
+      <input type="text" id="admin-macro-name" class="search-input" placeholder="Nom du niveau / macro (ex: Bloodbath)" style="width:100%; margin-bottom:10px;">
+      <input type="file" id="admin-file-input" style="margin-bottom:10px; color:var(--text-muted);">
+      <button class="action-btn" id="admin-add-btn">➕ Ajouter directement au site</button>
+    </div>
+
+    <!-- Section Liste des Macros Publiques -->
+    <div class="card">
+      <h2>
+        🌍 Macros Disponibles 
+        <span id="macro-count" style="font-size:0.8rem; color:var(--text-muted);">0 macro</span>
+      </h2>
+      
+      <div class="filter-bar">
+        <input type="text" id="search-box" class="search-input" placeholder="🔍 Rechercher une macro...">
+        <div class="filter-chips">
+          <div class="chip active" data-filter="all">Tous</div>
+          <div class="chip" data-filter="gdr">.gdr</div>
+          <div class="chip" data-filter="gdr2">.gdr2</div>
+          <div class="chip" data-filter="echo">.echo</div>
+          <div class="chip" data-filter="json">.json</div>
+          <div class="chip" data-filter="bot">.bot</div>
+        </div>
+      </div>
+
+      <div class="macro-list" id="macro-container">
+        <!-- Rempli dynamiquement -->
+      </div>
     </div>
 
   </div>
@@ -82,122 +259,164 @@
     const MY_GITHUB_USERNAME = "jaredjodin-source"; 
     const REPO_NAME = "jaredjodin-source.github.io";
     const SECRET_PASS = "jaredjfn";
-
     const ALLOWED_EXTENSIONS = ['gdr', 'gdr2', 'echo', 'json', 'bot'];
+    
     let isAdmin = false;
+    let currentFilter = 'all';
 
-    const publicMacros = [];
+    // Stockage local des macros validées
+    let macros = JSON.parse(localStorage.getItem('gd_macros')) || [
+      { name: "Exemple - Bloodbath (Bot)", ext: "bot", url: "#" }
+    ];
 
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
     const statusMsg = document.getElementById('status-msg');
     const loginBtn = document.getElementById('login-btn');
     const adminBadge = document.getElementById('admin-badge');
-    const tagContainer = document.getElementById('tag-container');
+    const adminPanel = document.getElementById('admin-panel');
     const subTitle = document.getElementById('sub-title');
     const macroContainer = document.getElementById('macro-container');
     const publishContainer = document.getElementById('publish-container');
     const publishLink = document.getElementById('publish-link');
+    const searchBox = document.getElementById('search-box');
+    const macroCount = document.getElementById('macro-count');
 
+    // Affichage des macros
     function renderMacros() {
+      const searchTerm = searchBox.value.toLowerCase();
       macroContainer.innerHTML = '';
-      if (publicMacros.length === 0) {
-        macroContainer.innerHTML = '<p style="text-align:center; color:#a0a5c0;">Aucune macro disponible pour le moment.</p>';
+      
+      const filtered = macros.filter(m => {
+        const matchesSearch = m.name.toLowerCase().includes(searchTerm);
+        const matchesExt = currentFilter === 'all' || m.ext === currentFilter;
+        return matchesSearch && matchesExt;
+      });
+
+      macroCount.textContent = `${filtered.length} macro${filtered.length > 1 ? 's' : ''}`;
+
+      if (filtered.length === 0) {
+        macroContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:20px;">Aucune macro trouvée.</p>';
         return;
       }
-      publicMacros.forEach(macro => {
+
+      filtered.forEach((macro, index) => {
         const item = document.createElement('div');
         item.className = 'macro-item';
         item.innerHTML = `
           <div class="macro-info">
-            <span class="macro-ext">${macro.ext.toUpperCase()}</span>
-            <span class="macro-name">${macro.name}.${macro.ext}</span>
+            <span class="macro-ext">${macro.ext}</span>
+            <span class="macro-name">${macro.name}</span>
           </div>
-          <a href="${macro.url}" class="download-btn" download>Télécharger</a>
+          <div class="macro-actions">
+            <a href="${macro.url}" class="download-btn" download="${macro.name}.${macro.ext}">Télécharger</a>
+            <button class="delete-btn" onclick="deleteMacro(${index})">🗑️</button>
+          </div>
         `;
         macroContainer.appendChild(item);
       });
-    }
-    renderMacros();
 
-    // Connexion via mot de passe jaredjfn
+      // Afficher ou cacher les boutons de suppression selon le mode admin
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.style.display = isAdmin ? 'block' : 'none';
+      });
+    }
+
+    // Gestion Connexion Admin
     loginBtn.addEventListener('click', () => {
       if (!isAdmin) {
-        const inputPass = prompt("Entrez le mot de passe Propriétaire :");
-        
-        if (inputPass === SECRET_PASS) {
+        const pass = prompt("Entrez le mot de passe Propriétaire :");
+        if (pass === SECRET_PASS) {
           isAdmin = true;
           adminBadge.style.display = 'inline-block';
-          loginBtn.textContent = '🟢 Connecté (Owner)';
-          subTitle.textContent = 'Accès Propriétaire : Vous pouvez importer tout type de fichier.';
-          tagContainer.innerHTML = '<span class="tag" style="color:#ff4d4d;">Mode Propriétaire - Tous fichiers autorisés</span>';
-          statusMsg.className = 'success';
-          statusMsg.textContent = '⚡ Bienvenue Propriétaire ! Filtre désactivé.';
-        } else if (inputPass !== null) {
+          adminPanel.style.display = 'block';
+          loginBtn.textContent = '🟢 Déconnexion';
+          subTitle.textContent = 'Mode Admin actif : Importation libre et gestion complète.';
+          renderMacros();
+        } else if (pass !== null) {
           alert("Mot de passe incorrect !");
         }
       } else {
         isAdmin = false;
         adminBadge.style.display = 'none';
+        adminPanel.style.display = 'none';
         loginBtn.textContent = '🔑 Connexion';
-        subTitle.textContent = 'Dépose tes macros Geometry Dash ici pour les partager à la communauté !';
-        tagContainer.innerHTML = `
-          <span class="tag">.gdr</span>
-          <span class="tag">.gdr2</span>
-          <span class="tag">.echo</span>
-          <span class="tag">.json</span>
-          <span class="tag">.bot</span>
-        `;
-        statusMsg.textContent = '';
-        publishContainer.style.display = 'none';
+        subTitle.textContent = 'Sélectionne ton fichier macro Geometry Dash pour le soumettre.';
+        renderMacros();
       }
     });
 
+    // Upload visiteur (Génération lien GitHub Issue)
     dropZone.addEventListener('click', () => fileInput.click());
-
-    dropZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropZone.classList.add('dragover');
-    });
-
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-      handleFiles(e.dataTransfer.files);
-    });
-
     fileInput.addEventListener('change', (e) => {
-      handleFiles(e.target.files);
-    });
-
-    function handleFiles(files) {
-      statusMsg.className = '';
-      statusMsg.textContent = '';
-      publishContainer.style.display = 'none';
-      let acceptedCount = 0;
-
-      Array.from(files).forEach(file => {
+      if (e.target.files.length > 0) {
+        const file = e.target.files[0];
         const ext = file.name.split('.').pop().toLowerCase();
         
-        if (isAdmin || ALLOWED_EXTENSIONS.includes(ext)) {
-          acceptedCount++;
-          const githubIssueUrl = `https://github.com/${MY_GITHUB_USERNAME}/${REPO_NAME}/issues/new?title=Nouvelle+Macro:+${encodeURIComponent(file.name)}&body=Proposition+de+macro+Geometry+Dash:+${encodeURIComponent(file.name)}`;
-          publishLink.href = githubIssueUrl;
+        if (ALLOWED_EXTENSIONS.includes(ext) || isAdmin) {
+          statusMsg.className = 'success';
+          statusMsg.textContent = `✅ Fichier "${file.name}" prêt à être soumis !`;
+          const issueUrl = `https://github.com/${MY_GITHUB_USERNAME}/${REPO_NAME}/issues/new?title=Macro:+${encodeURIComponent(file.name)}&body=Ajout+de+macro:+${encodeURIComponent(file.name)}`;
+          publishLink.href = issueUrl;
           publishContainer.style.display = 'block';
-
         } else {
           statusMsg.className = 'error';
-          statusMsg.textContent = `❌ Refusé : "${file.name}" n'est pas une macro valide !`;
+          statusMsg.textContent = `❌ Format non supporté (.${ext})`;
+          publishContainer.style.display = 'none';
         }
-      });
-
-      if (acceptedCount > 0 && !statusMsg.textContent.includes('Refusé')) {
-        statusMsg.className = 'success';
-        statusMsg.textContent = `✅ Fichier détecté ! Cliquez ci-dessous pour le publier publiquement.`;
       }
-    }
+    });
+
+    // Ajout direct Admin
+    document.getElementById('admin-add-btn').addEventListener('click', () => {
+      const nameInput = document.getElementById('admin-macro-name');
+      const fileInputAdmin = document.getElementById('admin-file-input');
+      
+      if (!nameInput.value || fileInputAdmin.files.length === 0) {
+        alert("Donne un nom et sélectionne un fichier !");
+        return;
+      }
+
+      const file = fileInputAdmin.files[0];
+      const ext = file.name.split('.').pop().toLowerCase();
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        macros.push({
+          name: nameInput.value,
+          ext: ext,
+          url: e.target.result // Sauvegarde le fichier directement en base64 dans le stockage local
+        });
+        localStorage.setItem('gd_macros', JSON.stringify(macros));
+        nameInput.value = '';
+        fileInputAdmin.value = '';
+        renderMacros();
+        alert("Macro ajoutée avec succès !");
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Suppression Admin
+    window.deleteMacro = function(index) {
+      if (confirm("Supprimer cette macro ?")) {
+        macros.splice(index, 1);
+        localStorage.setItem('gd_macros', JSON.stringify(macros));
+        renderMacros();
+      }
+    };
+
+    // Filtres et recherche
+    searchBox.addEventListener('input', renderMacros);
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        e.target.classList.add('active');
+        currentFilter = e.target.dataset.filter;
+        renderMacros();
+      });
+    });
+
+    renderMacros();
   </script>
 
 </body>
