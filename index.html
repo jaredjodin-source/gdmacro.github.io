@@ -47,7 +47,7 @@
   <div class="container">
     
     <div class="card">
-      <button class="admin-btn" id="login-btn">👤 Connexion Pseudo</button>
+      <button class="admin-btn" id="login-btn">🔑 Connexion</button>
       
       <h1>Coffre à Macros GD <span class="admin-badge" id="admin-badge">PROPRIÉTAIRE</span></h1>
       <p id="sub-title">Dépose tes macros Geometry Dash ici pour les partager à la communauté !</p>
@@ -81,14 +81,12 @@
   <script>
     const MY_GITHUB_USERNAME = "jaredjodin-source"; 
     const REPO_NAME = "jaredjodin-source.github.io";
+    const SECRET_PASS = "jaredjfn";
 
     const ALLOWED_EXTENSIONS = ['gdr', 'gdr2', 'echo', 'json', 'bot'];
     let isAdmin = false;
 
-    const publicMacros = [
-      { name: "Bloodlust_100percent", ext: "gdr2", url: "#" },
-      { name: "Acheron_Practice_Run", ext: "gdr", url: "#" }
-    ];
+    const publicMacros = [];
 
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
@@ -104,7 +102,7 @@
     function renderMacros() {
       macroContainer.innerHTML = '';
       if (publicMacros.length === 0) {
-        macroContainer.innerHTML = '<p style="text-align:center; color:#a0a5c0;">Aucune macro publique pour le moment.</p>';
+        macroContainer.innerHTML = '<p style="text-align:center; color:#a0a5c0;">Aucune macro disponible pour le moment.</p>';
         return;
       }
       publicMacros.forEach(macro => {
@@ -122,25 +120,26 @@
     }
     renderMacros();
 
+    // Connexion via mot de passe jaredjfn
     loginBtn.addEventListener('click', () => {
       if (!isAdmin) {
-        const inputUser = prompt("Entrez votre pseudo GitHub :");
+        const inputPass = prompt("Entrez le mot de passe Propriétaire :");
         
-        if (inputUser && inputUser.trim().toLowerCase() === MY_GITHUB_USERNAME.toLowerCase()) {
+        if (inputPass === SECRET_PASS) {
           isAdmin = true;
           adminBadge.style.display = 'inline-block';
-          loginBtn.textContent = '🟢 Connecté : ' + MY_GITHUB_USERNAME;
-          subTitle.textContent = 'Mode Propriétaire : Vous pouvez importer tout type de fichier.';
+          loginBtn.textContent = '🟢 Connecté (Owner)';
+          subTitle.textContent = 'Accès Propriétaire : Vous pouvez importer tout type de fichier.';
           tagContainer.innerHTML = '<span class="tag" style="color:#ff4d4d;">Mode Propriétaire - Tous fichiers autorisés</span>';
           statusMsg.className = 'success';
-          statusMsg.textContent = '⚡ Bienvenue ' + MY_GITHUB_USERNAME + ' !';
-        } else if (inputUser !== null) {
-          alert("Pseudo non reconnu comme propriétaire du projet.");
+          statusMsg.textContent = '⚡ Bienvenue Propriétaire ! Filtre désactivé.';
+        } else if (inputPass !== null) {
+          alert("Mot de passe incorrect !");
         }
       } else {
         isAdmin = false;
         adminBadge.style.display = 'none';
-        loginBtn.textContent = '👤 Connexion Pseudo';
+        loginBtn.textContent = '🔑 Connexion';
         subTitle.textContent = 'Dépose tes macros Geometry Dash ici pour les partager à la communauté !';
         tagContainer.innerHTML = `
           <span class="tag">.gdr</span>
@@ -196,11 +195,10 @@
 
       if (acceptedCount > 0 && !statusMsg.textContent.includes('Refusé')) {
         statusMsg.className = 'success';
-        statusMsg.textContent = `✅ Fichier macro détecté ! Cliquez ci-dessous pour le publier publiquement.`;
+        statusMsg.textContent = `✅ Fichier détecté ! Cliquez ci-dessous pour le publier publiquement.`;
       }
     }
   </script>
 
 </body>
-  </html>
-  
+</html>
