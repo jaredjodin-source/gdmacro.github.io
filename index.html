@@ -271,7 +271,8 @@
     const SECRET_PASS = "jaredjfn";
     const ALLOWED_EXTENSIONS = ['gdr', 'gdr2', 'echo', 'json', 'bot'];
     
-    let isAdmin = false;
+    // Check local storage for persistent login & token
+    let isAdmin = localStorage.getItem('gd_is_logged_in') === 'true';
     let ghToken = localStorage.getItem('gd_gh_token') || '';
     let currentFilter = 'all';
     let fetchedMacros = [];
@@ -291,6 +292,16 @@
     const ghTokenInput = document.getElementById('gh-token-input');
     const saveTokenBtn = document.getElementById('save-token-btn');
     const tokenStatus = document.getElementById('token-status');
+
+    // Apply initial admin UI state if logged in
+    if (isAdmin) {
+      adminBadge.style.display = 'inline-block';
+      adminPanel.style.display = 'block';
+      loginBtn.textContent = '🟢 Logout Owner';
+      if (ghToken) {
+        ghTokenInput.value = ghToken;
+      }
+    }
 
     // Fetch live macros from GitHub "macros/" directory
     async function loadLiveMacros() {
@@ -397,31 +408,32 @@
       }
     };
 
-    // Owner Login
+    // Owner Login / Logout Toggle
     loginBtn.addEventListener('click', () => {
       if (!isAdmin) {
         const pass = prompt("Enter Owner Password:");
         if (pass === SECRET_PASS) {
           isAdmin = true;
+          localStorage.setItem('gd_is_logged_in', 'true');
           adminBadge.style.display = 'inline-block';
           adminPanel.style.display = 'block';
           loginBtn.textContent = '🟢 Logout Owner';
           
-          // Load existing token into input
           if (ghToken) {
             ghTokenInput.value = ghToken;
           }
-          renderMacros(); // Re-render to show delete buttons
+          renderMacros();
         } else if (pass !== null) {
           alert("Incorrect password!");
         }
       } else {
-        // Logout
+        // Logout & clear persistent login session
         isAdmin = false;
+        localStorage.removeItem('gd_is_logged_in');
         adminBadge.style.display = 'none';
         adminPanel.style.display = 'none';
         loginBtn.textContent = '🔑 Owner Login';
-        renderMacros(); // Re-render to hide delete buttons
+        renderMacros();
       }
     });
 
@@ -537,4 +549,5 @@
   </script>
 
 </body>
-</html>
+  </html>
+  
