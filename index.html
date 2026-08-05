@@ -13,6 +13,7 @@
       --text-main: #ffffff;
       --text-muted: #c5c6c7;
       --danger: #ff4757;
+      --danger-hover: #ff6b81;
       --border: #2c3542;
     }
 
@@ -36,7 +37,6 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 25px;
-      position: relative;
     }
 
     h1 {
@@ -57,7 +57,6 @@
       border-radius: 20px;
       text-transform: uppercase;
       font-weight: bold;
-      letter-spacing: 1px;
     }
 
     .login-btn {
@@ -85,7 +84,6 @@
     h2 { color: var(--accent); font-size: 1.2rem; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
     p { color: var(--text-muted); margin-bottom: 15px; font-size: 0.95rem; }
 
-    /* Drop Zone */
     .drop-zone {
       border: 2px dashed var(--accent);
       border-radius: 10px;
@@ -95,10 +93,7 @@
       cursor: pointer;
       transition: 0.2s;
     }
-    .drop-zone:hover, .drop-zone.dragover {
-      background-color: rgba(102, 252, 241, 0.08);
-      border-color: #ffffff;
-    }
+    .drop-zone:hover { background-color: rgba(102, 252, 241, 0.08); border-color: #ffffff; }
     .drop-zone p { color: var(--text-main); margin: 0; font-weight: 500; }
 
     .allowed-tags { display: flex; gap: 6px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
@@ -127,13 +122,7 @@
     }
     .action-btn:hover { background: var(--accent-hover); }
 
-    /* Filter & Search Bar */
-    .filter-bar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-    }
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
     .search-input {
       flex: 1;
       min-width: 180px;
@@ -160,8 +149,7 @@
     }
     .chip.active, .chip:hover { background: var(--accent); color: #0b0c10; border-color: var(--accent); font-weight: bold; }
 
-    /* Macro List */
-    .macro-list { display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 2px; }
+    .macro-list { display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; }
     .macro-item {
       display: flex;
       justify-content: space-between;
@@ -170,21 +158,32 @@
       padding: 12px 15px;
       border-radius: 10px;
       border: 1px solid var(--border);
-      transition: 0.2s;
     }
-    .macro-item:hover { border-color: rgba(102, 252, 241, 0.4); }
     .macro-info { display: flex; align-items: center; gap: 12px; }
     .macro-ext { background: var(--accent); color: #0b0c10; font-size: 0.7rem; font-weight: bold; padding: 3px 7px; border-radius: 5px; text-transform: uppercase; }
-    .macro-name { font-weight: 600; font-size: 0.95rem; color: #fff; word-break: break-all; }
+    .macro-name { font-weight: 600; font-size: 0.95rem; color: #fff; }
     
     .macro-actions { display: flex; gap: 8px; align-items: center; }
+
     .download-btn { background: #2ecc71; color: #0b0c10; text-decoration: none; font-size: 0.8rem; font-weight: bold; padding: 6px 14px; border-radius: 6px; transition: 0.2s; }
     .download-btn:hover { background: #27ae60; }
-    .delete-btn { background: var(--danger); color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; display: none; }
-    .delete-btn:hover { background: #c0392b; }
 
-    /* Admin Panel */
+    .delete-btn { background: var(--danger); color: white; border: none; font-size: 0.8rem; font-weight: bold; padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+    .delete-btn:hover { background: var(--danger-hover); }
+
     #admin-panel { display: none; border-left: 4px solid var(--danger); }
+    
+    .token-container {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .token-container h3 { font-size: 0.95rem; color: var(--text-main); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .token-save-btn { background: var(--border); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: 0.2s; }
+    .token-save-btn:hover { background: var(--text-muted); color: #0b0c10; }
+
   </style>
 </head>
 <body>
@@ -192,14 +191,14 @@
   <div class="container">
     
     <header>
-      <h1>📦 GD Macro Vault <span class="admin-badge" id="admin-badge">Admin</span></h1>
-      <button class="login-btn" id="login-btn">🔑 Login</button>
+      <h1>📦 GD Macro Vault <span class="admin-badge" id="admin-badge">Owner</span></h1>
+      <button class="login-btn" id="login-btn">🔑 Owner Login</button>
     </header>
 
-    <!-- Share Section -->
+    <!-- Public Community Submit -->
     <div class="card">
-      <h2>Share a Macro</h2>
-      <p id="sub-title">Select your Geometry Dash macro file to submit it.</p>
+      <h2>Submit a Macro</h2>
+      <p>Select your Geometry Dash macro file to submit it automatically.</p>
       
       <div class="drop-zone" id="drop-zone">
         <p>Click here or drag your macro file</p>
@@ -216,24 +215,37 @@
       <div id="status-msg"></div>
       
       <div id="publish-container" style="display: none;">
-        <a id="publish-link" target="_blank" class="action-btn">🚀 Open GitHub to submit the macro</a>
+        <a id="publish-link" target="_blank" class="action-btn">🚀 Submit File Automatically</a>
       </div>
     </div>
 
-    <!-- Owner Panel (Quick Add) -->
+    <!-- Owner Panel (Direct Worldwide Publishing) -->
     <div class="card" id="admin-panel">
-      <h2>🛠️ Owner Panel (Quick Add)</h2>
-      <p>As an admin, you can directly add a macro to the site without going through GitHub Issues:</p>
-      <input type="text" id="admin-macro-name" class="search-input" placeholder="Level name / macro (e.g., Bloodbath)" style="width:100%; margin-bottom:10px;">
-      <input type="file" id="admin-file-input" style="margin-bottom:10px; color:var(--text-muted);">
-      <button class="action-btn" id="admin-add-btn">➕ Add directly to site</button>
+      <h2>🛠️ Owner Dashboard</h2>
+      
+      <!-- GITHUB TOKEN MANAGEMENT -->
+      <div class="token-container">
+        <h3>🔑 GitHub Personal Access Token</h3>
+        <p style="font-size: 0.8rem; margin-bottom: 10px;">Required for Direct Upload and Deleting files.</p>
+        <div style="display: flex; gap: 10px;">
+          <input type="password" id="gh-token-input" class="search-input" placeholder="ghp_..." style="flex: 1; margin: 0;">
+          <button class="token-save-btn" id="save-token-btn">Save Token</button>
+        </div>
+        <div id="token-status" style="margin-top: 8px; font-size: 0.8rem; font-weight: bold;"></div>
+      </div>
+
+      <!-- DIRECT UPLOAD -->
+      <p>Select a file to publish it <strong>directly to the live site worldwide</strong>:</p>
+      <input type="file" id="owner-file-input" style="margin-bottom:15px; color:var(--text-muted); display:block;">
+      <button class="action-btn" id="owner-upload-btn">⚡ Upload Directly to GitHub</button>
+      <div id="owner-status" style="margin-top:10px; font-weight:bold; font-size:0.9rem;"></div>
     </div>
 
-    <!-- Available Macros Section -->
+    <!-- Public List Section -->
     <div class="card">
       <h2>
-        🌍 Available Macros 
-        <span id="macro-count" style="font-size:0.8rem; color:var(--text-muted);">0 macro</span>
+        🌍 Live Public Macros 
+        <span id="macro-count" style="font-size:0.8rem; color:var(--text-muted);">Loading...</span>
       </h2>
       
       <div class="filter-bar">
@@ -248,25 +260,21 @@
         </div>
       </div>
 
-      <div class="macro-list" id="macro-container">
-        <!-- Dynamically filled -->
-      </div>
+      <div class="macro-list" id="macro-container"></div>
     </div>
 
   </div>
 
   <script>
-    const MY_GITHUB_USERNAME = "jaredjodin-source"; 
-    const REPO_NAME = "jaredjodin-source.github.io";
+    const USERNAME = "jaredjodin-source"; 
+    const REPO = "jaredjodin-source.github.io";
     const SECRET_PASS = "jaredjfn";
     const ALLOWED_EXTENSIONS = ['gdr', 'gdr2', 'echo', 'json', 'bot'];
     
     let isAdmin = false;
+    let ghToken = localStorage.getItem('gd_gh_token') || '';
     let currentFilter = 'all';
-
-    let macros = JSON.parse(localStorage.getItem('gd_macros')) || [
-      { name: "Example - Bloodbath (Bot)", ext: "bot", url: "#" }
-    ];
+    let fetchedMacros = [];
 
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
@@ -274,18 +282,54 @@
     const loginBtn = document.getElementById('login-btn');
     const adminBadge = document.getElementById('admin-badge');
     const adminPanel = document.getElementById('admin-panel');
-    const subTitle = document.getElementById('sub-title');
     const macroContainer = document.getElementById('macro-container');
     const publishContainer = document.getElementById('publish-container');
     const publishLink = document.getElementById('publish-link');
     const searchBox = document.getElementById('search-box');
     const macroCount = document.getElementById('macro-count');
+    
+    const ghTokenInput = document.getElementById('gh-token-input');
+    const saveTokenBtn = document.getElementById('save-token-btn');
+    const tokenStatus = document.getElementById('token-status');
+
+    // Fetch live macros from GitHub "macros/" directory
+    async function loadLiveMacros() {
+      macroCount.textContent = "Loading...";
+      try {
+        const response = await fetch(`https://api.github.com/repos/${USERNAME}/${REPO}/contents/macros`);
+        if (response.ok) {
+          const files = await response.json();
+          fetchedMacros = files
+            .filter(file => {
+              const ext = file.name.split('.').pop().toLowerCase();
+              return ALLOWED_EXTENSIONS.includes(ext);
+            })
+            .map(file => {
+              const parts = file.name.split('.');
+              const ext = parts.pop().toLowerCase();
+              return {
+                fullName: file.name,
+                name: parts.join('.'),
+                ext: ext,
+                url: file.download_url,
+                sha: file.sha
+              };
+            });
+        } else {
+          fetchedMacros = [];
+        }
+      } catch (err) {
+        console.error("Error fetching macros:", err);
+        fetchedMacros = [];
+      }
+      renderMacros();
+    }
 
     function renderMacros() {
       const searchTerm = searchBox.value.toLowerCase();
       macroContainer.innerHTML = '';
       
-      const filtered = macros.filter(m => {
+      const filtered = fetchedMacros.filter(m => {
         const matchesSearch = m.name.toLowerCase().includes(searchTerm);
         const matchesExt = currentFilter === 'all' || m.ext === currentFilter;
         return matchesSearch && matchesExt;
@@ -294,109 +338,190 @@
       macroCount.textContent = `${filtered.length} macro${filtered.length > 1 ? 's' : ''}`;
 
       if (filtered.length === 0) {
-        macroContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:20px;">No macros found.</p>';
+        macroContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:20px;">No public macros found yet.</p>';
         return;
       }
 
-      filtered.forEach((macro, index) => {
+      filtered.forEach((macro) => {
         const item = document.createElement('div');
         item.className = 'macro-item';
+        
+        const deleteButtonHTML = isAdmin 
+          ? `<button class="delete-btn" onclick="deleteMacro('${macro.fullName}', '${macro.sha}')" title="Delete macro">🗑️</button>` 
+          : '';
+
         item.innerHTML = `
           <div class="macro-info">
             <span class="macro-ext">${macro.ext}</span>
             <span class="macro-name">${macro.name}</span>
           </div>
           <div class="macro-actions">
-            <a href="${macro.url}" class="download-btn" download="${macro.name}.${macro.ext}">Download</a>
-            <button class="delete-btn" onclick="deleteMacro(${index})">🗑️</button>
+            <a href="${macro.url}" class="download-btn" download>Download</a>
+            ${deleteButtonHTML}
           </div>
         `;
         macroContainer.appendChild(item);
       });
-
-      document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.style.display = isAdmin ? 'block' : 'none';
-      });
     }
 
+    // Function to delete macro (Owner action)
+    window.deleteMacro = async function(fileName, sha) {
+      if (!ghToken) {
+        alert("⚠️ You need to enter your GitHub Token in the Owner Panel first!");
+        return;
+      }
+      if (!confirm(`Are you sure you want to delete "${fileName}" from the live site?`)) return;
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/${USERNAME}/${REPO}/contents/macros/${fileName}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `token ${ghToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: `Delete macro ${fileName} via Vault Admin`,
+            sha: sha
+          })
+        });
+
+        if (res.ok) {
+          alert(`🎉 "${fileName}" has been deleted!`);
+          loadLiveMacros();
+        } else {
+          const errData = await res.json();
+          alert(`❌ Deletion failed: ${errData.message}`);
+        }
+      } catch (err) {
+        alert("❌ Connection error while deleting.");
+      }
+    };
+
+    // Owner Login
     loginBtn.addEventListener('click', () => {
       if (!isAdmin) {
-        const pass = prompt("Enter Owner password:");
+        const pass = prompt("Enter Owner Password:");
         if (pass === SECRET_PASS) {
           isAdmin = true;
           adminBadge.style.display = 'inline-block';
           adminPanel.style.display = 'block';
-          loginBtn.textContent = '🟢 Logout';
-          subTitle.textContent = 'Admin mode active: Free import and full management.';
-          renderMacros();
+          loginBtn.textContent = '🟢 Logout Owner';
+          
+          // Load existing token into input
+          if (ghToken) {
+            ghTokenInput.value = ghToken;
+          }
+          renderMacros(); // Re-render to show delete buttons
         } else if (pass !== null) {
           alert("Incorrect password!");
         }
       } else {
+        // Logout
         isAdmin = false;
         adminBadge.style.display = 'none';
         adminPanel.style.display = 'none';
-        loginBtn.textContent = '🔑 Login';
-        subTitle.textContent = 'Select your Geometry Dash macro file to submit it.';
-        renderMacros();
+        loginBtn.textContent = '🔑 Owner Login';
+        renderMacros(); // Re-render to hide delete buttons
       }
     });
 
+    // Save Token Button
+    saveTokenBtn.addEventListener('click', () => {
+      const newToken = ghTokenInput.value.trim();
+      if (newToken) {
+        ghToken = newToken;
+        localStorage.setItem('gd_gh_token', ghToken);
+        tokenStatus.style.color = '#2ecc71';
+        tokenStatus.textContent = '✅ Token saved securely in your browser.';
+        setTimeout(() => tokenStatus.textContent = '', 3000);
+      } else {
+        tokenStatus.style.color = 'var(--danger)';
+        tokenStatus.textContent = '❌ Token cannot be empty.';
+      }
+    });
+
+    // Public File Upload Proposal
     dropZone.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', (e) => {
       if (e.target.files.length > 0) {
         const file = e.target.files[0];
         const ext = file.name.split('.').pop().toLowerCase();
         
-        if (ALLOWED_EXTENSIONS.includes(ext) || isAdmin) {
+        if (ALLOWED_EXTENSIONS.includes(ext)) {
           statusMsg.className = 'success';
-          statusMsg.textContent = `✅ File "${file.name}" ready to be submitted!`;
-          const issueUrl = `https://github.com/${MY_GITHUB_USERNAME}/${REPO_NAME}/issues/new?title=Macro:+${encodeURIComponent(file.name)}&body=Add+macro:+${encodeURIComponent(file.name)}`;
+          statusMsg.textContent = `✅ File "${file.name}" ready!`;
+          const issueUrl = `https://github.com/${USERNAME}/${REPO}/issues/new?title=Macro:+${encodeURIComponent(file.name)}&body=Macro+submission:+${encodeURIComponent(file.name)}`;
           publishLink.href = issueUrl;
           publishContainer.style.display = 'block';
         } else {
           statusMsg.className = 'error';
-          statusMsg.textContent = `❌ Unsupported format (.${ext})`;
+          statusMsg.textContent = `❌ Extension not allowed (.${ext}). Only GD macros (.gdr, .gdr2, .echo, .json, .bot) are accepted.`;
           publishContainer.style.display = 'none';
         }
       }
     });
 
-    document.getElementById('admin-add-btn').addEventListener('click', () => {
-      const nameInput = document.getElementById('admin-macro-name');
-      const fileInputAdmin = document.getElementById('admin-file-input');
-      
-      if (!nameInput.value || fileInputAdmin.files.length === 0) {
-        alert("Provide a name and select a file!");
+    // Owner Direct Upload
+    document.getElementById('owner-upload-btn').addEventListener('click', async () => {
+      if (!ghToken) {
+        alert("⚠️ You need to enter your GitHub Token in the Owner Panel first!");
         return;
       }
 
-      const file = fileInputAdmin.files[0];
-      const ext = file.name.split('.').pop().toLowerCase();
-      const reader = new FileReader();
+      const ownerFile = document.getElementById('owner-file-input').files[0];
+      const ownerStatus = document.getElementById('owner-status');
 
-      reader.onload = function(e) {
-        macros.push({
-          name: nameInput.value,
-          ext: ext,
-          url: e.target.result
-        });
-        localStorage.setItem('gd_macros', JSON.stringify(macros));
-        nameInput.value = '';
-        fileInputAdmin.value = '';
-        renderMacros();
-        alert("Macro successfully added!");
-      };
-      reader.readAsDataURL(file);
-    });
-
-    window.deleteMacro = function(index) {
-      if (confirm("Delete this macro?")) {
-        macros.splice(index, 1);
-        localStorage.setItem('gd_macros', JSON.stringify(macros));
-        renderMacros();
+      if (!ownerFile) {
+        alert("Please select a file first!");
+        return;
       }
-    };
+
+      const ext = ownerFile.name.split('.').pop().toLowerCase();
+      if (!ALLOWED_EXTENSIONS.includes(ext)) {
+        ownerStatus.className = 'error';
+        ownerStatus.textContent = `❌ Extension not allowed (.${ext}).`;
+        return;
+      }
+
+      ownerStatus.className = '';
+      ownerStatus.style.color = 'var(--accent)';
+      ownerStatus.textContent = "⏳ Uploading to GitHub...";
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const base64Content = e.target.result.split(',')[1];
+        const filePath = `macros/${ownerFile.name}`;
+
+        try {
+          const res = await fetch(`https://api.github.com/repos/${USERNAME}/${REPO}/contents/${filePath}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `token ${ghToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              message: `Add macro ${ownerFile.name} via Vault Admin`,
+              content: base64Content
+            })
+          });
+
+          if (res.ok) {
+            ownerStatus.className = 'success';
+            ownerStatus.textContent = `🎉 "${ownerFile.name}" published worldwide!`;
+            document.getElementById('owner-file-input').value = '';
+            setTimeout(loadLiveMacros, 1500);
+          } else {
+            const errorData = await res.json();
+            ownerStatus.className = 'error';
+            ownerStatus.textContent = `❌ Upload failed: ${errorData.message}`;
+          }
+        } catch (err) {
+          ownerStatus.className = 'error';
+          ownerStatus.textContent = "❌ Connection error.";
+        }
+      };
+      reader.readAsDataURL(ownerFile);
+    });
 
     searchBox.addEventListener('input', renderMacros);
     document.querySelectorAll('.chip').forEach(chip => {
@@ -408,7 +533,7 @@
       });
     });
 
-    renderMacros();
+    loadLiveMacros();
   </script>
 
 </body>
