@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coffre à Macros GD</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #0f111a; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+    .container { width: 100%; max-width: 650px; }
+    .card { background-color: #1a1d2e; border: 2px solid #2a2f4c; border-radius: 12px; padding: 25px; margin-bottom: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; }
+    
+    .admin-btn { position: absolute; top: 15px; right: 15px; background: #2a2f4c; color: #a0a5c0; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: 0.2s; }
+    .admin-btn:hover { background: #3a4168; color: #fff; }
+    .admin-badge { display: none; background: #ff4d4d; color: #fff; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; margin-left: 5px; font-weight: bold; }
+    
+    h1 { color: #00d2ff; margin-bottom: 8px; font-size: 1.8rem; }
+    h2 { color: #00d2ff; font-size: 1.2rem; margin-bottom: 15px; text-align: left; }
+    p { color: #a0a5c0; margin-bottom: 20px; font-size: 0.95rem; }
+    
+    .drop-zone { border: 2px dashed #00d2ff; border-radius: 8px; padding: 35px 20px; background-color: rgba(0, 210, 255, 0.05); cursor: pointer; transition: 0.2s; }
+    .drop-zone:hover, .drop-zone.dragover { background-color: rgba(0, 210, 255, 0.15); border-color: #3a7bd5; }
+    .drop-zone p { color: #d0d5f0; margin: 0; font-weight: 500; }
+    
+    .allowed-tags { display: flex; gap: 8px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
+    .tag { background: #2a2f4c; color: #00d2ff; font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; font-weight: bold; }
+    
+    #file-input { display: none; }
+    #status-msg { margin-top: 15px; font-weight: bold; font-size: 0.95rem; }
+    .success { color: #00ff88; }
+    .error { color: #ff4d4d; }
+    
+    .publish-btn { display: inline-block; margin-top: 15px; background: #00d2ff; color: #000; font-weight: bold; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; transition: 0.2s; }
+    .publish-btn:hover { background: #00a2c7; }
+
+    .macro-list { text-align: left; }
+    .macro-item { display: flex; justify-content: space-between; align-items: center; background: #121420; padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #2a2f4c; }
+    .macro-info { display: flex; align-items: center; gap: 10px; }
+    .macro-name { font-weight: bold; font-size: 0.9rem; color: #ffffff; }
+    .macro-ext { background: #00d2ff; color: #000; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
+    .download-btn { background: #00ff88; color: #000; text-decoration: none; font-size: 0.8rem; font-weight: bold; padding: 6px 12px; border-radius: 6px; transition: 0.2s; }
+    .download-btn:hover { background: #00cc6a; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <div class="card">
+      <button class="admin-btn" id="login-btn">👤 Connexion Pseudo</button>
+      
+      <h1>Coffre à Macros GD <span class="admin-badge" id="admin-badge">PROPRIÉTAIRE</span></h1>
+      <p id="sub-title">Dépose tes macros Geometry Dash ici pour les partager à la communauté !</p>
+      
+      <div class="drop-zone" id="drop-zone">
+        <p id="drop-text">Glisse ton fichier macro ici ou <strong>clique pour parcourir</strong></p>
+        <div class="allowed-tags" id="tag-container">
+          <span class="tag">.gdr</span>
+          <span class="tag">.gdr2</span>
+          <span class="tag">.echo</span>
+          <span class="tag">.json</span>
+          <span class="tag">.bot</span>
+        </div>
+      </div>
+      
+      <input type="file" id="file-input" multiple>
+      
+      <div id="status-msg"></div>
+      <div id="publish-container" style="display: none;">
+        <a id="publish-link" target="_blank" class="publish-btn">🚀 Soumettre cette macro pour tout le monde</a>
+      </div>
+    </div>
+
+    <div class="card macro-list">
+      <h2>🌍 Macros Téléchargeables par Tout le Monde</h2>
+      <div id="macro-container"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const MY_GITHUB_USERNAME = "jaredjodin-source"; 
+    const REPO_NAME = "jaredjodin-source.github.io";
+
+    const ALLOWED_EXTENSIONS = ['gdr', 'gdr2', 'echo', 'json', 'bot'];
+    let isAdmin = false;
+
+    const publicMacros = [
+      { name: "Bloodlust_100percent", ext: "gdr2", url: "#" },
+      { name: "Acheron_Practice_Run", ext: "gdr", url: "#" }
+    ];
+
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const statusMsg = document.getElementById('status-msg');
+    const loginBtn = document.getElementById('login-btn');
+    const adminBadge = document.getElementById('admin-badge');
+    const tagContainer = document.getElementById('tag-container');
+    const subTitle = document.getElementById('sub-title');
+    const macroContainer = document.getElementById('macro-container');
+    const publishContainer = document.getElementById('publish-container');
+    const publishLink = document.getElementById('publish-link');
+
+    function renderMacros() {
+      macroContainer.innerHTML = '';
+      if (publicMacros.length === 0) {
+        macroContainer.innerHTML = '<p style="text-align:center; color:#a0a5c0;">Aucune macro publique pour le moment.</p>';
+        return;
+      }
+      publicMacros.forEach(macro => {
+        const item = document.createElement('div');
+        item.className = 'macro-item';
+        item.innerHTML = `
+          <div class="macro-info">
+            <span class="macro-ext">${macro.ext.toUpperCase()}</span>
+            <span class="macro-name">${macro.name}.${macro.ext}</span>
+          </div>
+          <a href="${macro.url}" class="download-btn" download>Télécharger</a>
+        `;
+        macroContainer.appendChild(item);
+      });
+    }
+    renderMacros();
+
+    loginBtn.addEventListener('click', () => {
+      if (!isAdmin) {
+        const inputUser = prompt("Entrez votre pseudo GitHub :");
+        
+        if (inputUser && inputUser.trim().toLowerCase() === MY_GITHUB_USERNAME.toLowerCase()) {
+          isAdmin = true;
+          adminBadge.style.display = 'inline-block';
+          loginBtn.textContent = '🟢 Connecté : ' + MY_GITHUB_USERNAME;
+          subTitle.textContent = 'Mode Propriétaire : Vous pouvez importer tout type de fichier.';
+          tagContainer.innerHTML = '<span class="tag" style="color:#ff4d4d;">Mode Propriétaire - Tous fichiers autorisés</span>';
+          statusMsg.className = 'success';
+          statusMsg.textContent = '⚡ Bienvenue ' + MY_GITHUB_USERNAME + ' !';
+        } else if (inputUser !== null) {
+          alert("Pseudo non reconnu comme propriétaire du projet.");
+        }
+      } else {
+        isAdmin = false;
+        adminBadge.style.display = 'none';
+        loginBtn.textContent = '👤 Connexion Pseudo';
+        subTitle.textContent = 'Dépose tes macros Geometry Dash ici pour les partager à la communauté !';
+        tagContainer.innerHTML = `
+          <span class="tag">.gdr</span>
+          <span class="tag">.gdr2</span>
+          <span class="tag">.echo</span>
+          <span class="tag">.json</span>
+          <span class="tag">.bot</span>
+        `;
+        statusMsg.textContent = '';
+        publishContainer.style.display = 'none';
+      }
+    });
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+      statusMsg.className = '';
+      statusMsg.textContent = '';
+      publishContainer.style.display = 'none';
+      let acceptedCount = 0;
+
+      Array.from(files).forEach(file => {
+        const ext = file.name.split('.').pop().toLowerCase();
+        
+        if (isAdmin || ALLOWED_EXTENSIONS.includes(ext)) {
+          acceptedCount++;
+          const githubIssueUrl = `https://github.com/${MY_GITHUB_USERNAME}/${REPO_NAME}/issues/new?title=Nouvelle+Macro:+${encodeURIComponent(file.name)}&body=Proposition+de+macro+Geometry+Dash:+${encodeURIComponent(file.name)}`;
+          publishLink.href = githubIssueUrl;
+          publishContainer.style.display = 'block';
+
+        } else {
+          statusMsg.className = 'error';
+          statusMsg.textContent = `❌ Refusé : "${file.name}" n'est pas une macro valide !`;
+        }
+      });
+
+      if (acceptedCount > 0 && !statusMsg.textContent.includes('Refusé')) {
+        statusMsg.className = 'success';
+        statusMsg.textContent = `✅ Fichier macro détecté ! Cliquez ci-dessous pour le publier publiquement.`;
+      }
+    }
+  </script>
+
+</body>
+  </html>
+  
