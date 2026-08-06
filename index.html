@@ -159,11 +159,11 @@
       border-radius: 10px;
       border: 1px solid var(--border);
     }
-    .macro-info { display: flex; align-items: center; gap: 12px; }
+    .macro-info { display: flex; align-items: center; gap: 12px; overflow: hidden; }
     .macro-ext { background: var(--accent); color: #0b0c10; font-size: 0.7rem; font-weight: bold; padding: 3px 7px; border-radius: 5px; text-transform: uppercase; }
-    .macro-name { font-weight: 600; font-size: 0.95rem; color: #fff; }
+    .macro-name { font-weight: 600; font-size: 0.95rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
-    .macro-actions { display: flex; gap: 8px; align-items: center; }
+    .macro-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
 
     .download-btn { background: #2ecc71; color: #0b0c10; text-decoration: none; font-size: 0.8rem; font-weight: bold; padding: 6px 14px; border-radius: 6px; transition: 0.2s; }
     .download-btn:hover { background: #27ae60; }
@@ -198,7 +198,7 @@
     <!-- Public Community Submit -->
     <div class="card">
       <h2>Submit a Macro</h2>
-      <p>Select your Geometry Dash macro file to submit it automatically.</p>
+      <p>Select your Geometry Dash macro file to submit it automatically via GitHub Issues.</p>
       
       <div class="drop-zone" id="drop-zone">
         <p>Click here or drag your macro file</p>
@@ -215,18 +215,18 @@
       <div id="status-msg"></div>
       
       <div id="publish-container" style="display: none;">
-        <a id="publish-link" target="_blank" class="action-btn">🚀 Submit File Automatically</a>
+        <a id="publish-link" target="_blank" class="action-btn">🚀 Submit File to Robot</a>
       </div>
     </div>
 
-    <!-- Owner Panel (Direct Worldwide Publishing) -->
+    <!-- Owner Panel (Direct Worldwide Publishing - NO LIMITS) -->
     <div class="card" id="admin-panel">
-      <h2>🛠️ Owner Dashboard</h2>
+      <h2>🛠️ Owner Dashboard (Any File Type)</h2>
       
       <!-- GITHUB TOKEN MANAGEMENT -->
       <div class="token-container">
         <h3>🔑 GitHub Personal Access Token</h3>
-        <p style="font-size: 0.8rem; margin-bottom: 10px;">Required for Direct Upload and Deleting files.</p>
+        <p style="font-size: 0.8rem; margin-bottom: 10px;">Required for Direct Upload and Deleting files bypass.</p>
         <div style="display: flex; gap: 10px;">
           <input type="password" id="gh-token-input" class="search-input" placeholder="ghp_..." style="flex: 1; margin: 0;">
           <button class="token-save-btn" id="save-token-btn">Save Token</button>
@@ -235,23 +235,23 @@
       </div>
 
       <!-- DIRECT UPLOAD -->
-      <p>Select a file to publish it <strong>directly to the live site worldwide</strong>:</p>
+      <p>Select <strong>ANY</strong> file to publish it directly to the site:</p>
       <input type="file" id="owner-file-input" style="margin-bottom:15px; color:var(--text-muted); display:block;">
-      <button class="action-btn" id="owner-upload-btn">⚡ Upload Directly to GitHub</button>
+      <button class="action-btn" id="owner-upload-btn">⚡ Upload Directly (Bypass Filters)</button>
       <div id="owner-status" style="margin-top:10px; font-weight:bold; font-size:0.9rem;"></div>
     </div>
 
     <!-- Public List Section -->
     <div class="card">
       <h2>
-        🌍 Live Public Macros 
+        🌍 Live Files 
         <span id="macro-count" style="font-size:0.8rem; color:var(--text-muted);">Loading...</span>
       </h2>
       
       <div class="filter-bar">
-        <input type="text" id="search-box" class="search-input" placeholder="🔍 Search a macro...">
+        <input type="text" id="search-box" class="search-input" placeholder="🔍 Search a file...">
         <div class="filter-chips">
-          <div class="chip active" data-filter="all">All</div>
+          <div class="chip active" data-filter="all">All Files</div>
           <div class="chip" data-filter="gdr">.gdr</div>
           <div class="chip" data-filter="gdr2">.gdr2</div>
           <div class="chip" data-filter="echo">.echo</div>
@@ -303,34 +303,29 @@
       }
     }
 
-    // Fetch live macros from GitHub "macros/" directory
+    // Fetch live files from GitHub "macros/" directory
     async function loadLiveMacros() {
       macroCount.textContent = "Loading...";
       try {
         const response = await fetch(`https://api.github.com/repos/${USERNAME}/${REPO}/contents/macros`);
         if (response.ok) {
           const files = await response.json();
-          fetchedMacros = files
-            .filter(file => {
-              const ext = file.name.split('.').pop().toLowerCase();
-              return ALLOWED_EXTENSIONS.includes(ext);
-            })
-            .map(file => {
-              const parts = file.name.split('.');
-              const ext = parts.pop().toLowerCase();
-              return {
-                fullName: file.name,
-                name: parts.join('.'),
-                ext: ext,
-                url: file.download_url,
-                sha: file.sha
-              };
-            });
+          fetchedMacros = files.map(file => {
+            const parts = file.name.split('.');
+            const ext = parts.length > 1 ? parts.pop().toLowerCase() : 'file';
+            return {
+              fullName: file.name,
+              name: parts.join('.'),
+              ext: ext,
+              url: file.download_url,
+              sha: file.sha
+            };
+          });
         } else {
           fetchedMacros = [];
         }
       } catch (err) {
-        console.error("Error fetching macros:", err);
+        console.error("Error fetching files:", err);
         fetchedMacros = [];
       }
       renderMacros();
@@ -341,15 +336,15 @@
       macroContainer.innerHTML = '';
       
       const filtered = fetchedMacros.filter(m => {
-        const matchesSearch = m.name.toLowerCase().includes(searchTerm);
+        const matchesSearch = m.name.toLowerCase().includes(searchTerm) || m.ext.includes(searchTerm);
         const matchesExt = currentFilter === 'all' || m.ext === currentFilter;
         return matchesSearch && matchesExt;
       });
 
-      macroCount.textContent = `${filtered.length} macro${filtered.length > 1 ? 's' : ''}`;
+      macroCount.textContent = `${filtered.length} file${filtered.length > 1 ? 's' : ''}`;
 
       if (filtered.length === 0) {
-        macroContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:20px;">No public macros found yet.</p>';
+        macroContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:20px;">No files found.</p>';
         return;
       }
 
@@ -358,11 +353,11 @@
         item.className = 'macro-item';
         
         const deleteButtonHTML = isAdmin 
-          ? `<button class="delete-btn" onclick="deleteMacro('${macro.fullName}', '${macro.sha}')" title="Delete macro">🗑️</button>` 
+          ? `<button class="delete-btn" onclick="deleteMacro('${macro.fullName}', '${macro.sha}')" title="Delete file">🗑️</button>` 
           : '';
 
         item.innerHTML = `
-          <div class="macro-info">
+          <div class="macro-info" title="${macro.fullName}">
             <span class="macro-ext">${macro.ext}</span>
             <span class="macro-name">${macro.name}</span>
           </div>
@@ -391,7 +386,7 @@
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            message: `Delete macro ${fileName} via Vault Admin`,
+            message: `Delete file ${fileName} via Vault Admin`,
             sha: sha
           })
         });
@@ -427,7 +422,6 @@
           alert("Incorrect password!");
         }
       } else {
-        // Logout & clear persistent login session
         isAdmin = false;
         localStorage.removeItem('gd_is_logged_in');
         adminBadge.style.display = 'none';
@@ -452,13 +446,14 @@
       }
     });
 
-    // Public File Upload Proposal
+    // Public File Upload Proposal (Restricted to Macros)
     dropZone.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', (e) => {
       if (e.target.files.length > 0) {
         const file = e.target.files[0];
         const ext = file.name.split('.').pop().toLowerCase();
         
+        // PUBLIC CHECK: Only allow macros
         if (ALLOWED_EXTENSIONS.includes(ext)) {
           statusMsg.className = 'success';
           statusMsg.textContent = `✅ File "${file.name}" ready!`;
@@ -467,13 +462,13 @@
           publishContainer.style.display = 'block';
         } else {
           statusMsg.className = 'error';
-          statusMsg.textContent = `❌ Extension not allowed (.${ext}). Only GD macros (.gdr, .gdr2, .echo, .json, .bot) are accepted.`;
+          statusMsg.textContent = `❌ Extension not allowed (.${ext}). Only macros (.gdr, .gdr2, .echo, .json, .bot) are accepted here.`;
           publishContainer.style.display = 'none';
         }
       }
     });
 
-    // Owner Direct Upload
+    // Owner Direct Upload (NO RESTRICTIONS)
     document.getElementById('owner-upload-btn').addEventListener('click', async () => {
       if (!ghToken) {
         alert("⚠️ You need to enter your GitHub Token in the Owner Panel first!");
@@ -488,13 +483,7 @@
         return;
       }
 
-      const ext = ownerFile.name.split('.').pop().toLowerCase();
-      if (!ALLOWED_EXTENSIONS.includes(ext)) {
-        ownerStatus.className = 'error';
-        ownerStatus.textContent = `❌ Extension not allowed (.${ext}).`;
-        return;
-      }
-
+      // NO EXTENSION CHECK FOR OWNER!
       ownerStatus.className = '';
       ownerStatus.style.color = 'var(--accent)';
       ownerStatus.textContent = "⏳ Uploading to GitHub...";
@@ -512,7 +501,7 @@
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              message: `Add macro ${ownerFile.name} via Vault Admin`,
+              message: `Add file ${ownerFile.name} via Vault Admin`,
               content: base64Content
             })
           });
@@ -549,5 +538,4 @@
   </script>
 
 </body>
-  </html>
-  
+</html>
