@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GD Macro Vault - Owner Only</title>
+  <title>GD Macro Vault</title>
   <style>
     :root {
       --bg-color: #0b0c10;
@@ -177,11 +177,19 @@
       <button class="login-btn" id="login-btn">🔑 Owner Login</button>
     </header>
 
+    <!-- Public Request Card -->
+    <div class="card">
+      <h2>Need a specific macro?</h2>
+      <p>Click the button below to request a macro directly on GitHub Issues.</p>
+      <a href="https://github.com/jaredjodin-source/gdmacro.github.io/issues/new?title=Macro+Request&body=Describe+the+macro+you+want+here..." target="_blank" class="action-btn">
+        📝 Demander un macro
+      </a>
+    </div>
+
     <!-- Owner Dashboard (Hidden by default, unlocked with password "jaredjfn") -->
     <div class="card" id="admin-panel">
       <h2>🛠️ Owner Dashboard (Direct Upload)</h2>
       
-      <!-- GITHUB TOKEN MANAGEMENT -->
       <div class="token-container">
         <h3>🔑 GitHub Personal Access Token</h3>
         <p style="font-size: 0.8rem; margin-bottom: 10px;">Required to upload any file type and delete files directly.</p>
@@ -192,7 +200,6 @@
         <div id="token-status" style="margin-top: 8px; font-size: 0.8rem; font-weight: bold;"></div>
       </div>
 
-      <!-- DIRECT UPLOAD (ANY FILE) -->
       <p>Select <strong>ANY</strong> file to publish it directly to the site:</p>
       <input type="file" id="owner-file-input" style="margin-bottom:15px; color:var(--text-muted); display:block;">
       <button class="action-btn" id="owner-upload-btn">⚡ Upload Directly</button>
