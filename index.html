@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GD Macro Vault</title>
+  <title>GD Macro Vault - Owner Only</title>
   <style>
     :root {
       --bg-color: #0b0c10;
@@ -84,26 +84,6 @@
     h2 { color: var(--accent); font-size: 1.2rem; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
     p { color: var(--text-muted); margin-bottom: 15px; font-size: 0.95rem; }
 
-    .drop-zone {
-      border: 2px dashed var(--accent);
-      border-radius: 10px;
-      padding: 30px 20px;
-      background-color: rgba(102, 252, 241, 0.03);
-      text-align: center;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .drop-zone:hover { background-color: rgba(102, 252, 241, 0.08); border-color: #ffffff; }
-    .drop-zone p { color: var(--text-main); margin: 0; font-weight: 500; }
-
-    .allowed-tags { display: flex; gap: 6px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
-    .tag { background: #0b0c10; color: var(--accent); font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; font-weight: bold; border: 1px solid var(--border); }
-
-    #file-input { display: none; }
-    #status-msg { margin-top: 12px; font-weight: bold; font-size: 0.9rem; text-align: center; }
-    .success { color: #2ecc71; }
-    .error { color: var(--danger); }
-
     .action-btn {
       display: block;
       width: 100%;
@@ -149,7 +129,7 @@
     }
     .chip.active, .chip:hover { background: var(--accent); color: #0b0c10; border-color: var(--accent); font-weight: bold; }
 
-    .macro-list { display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; }
+    .macro-list { display: flex; flex-direction: column; gap: 10px; max-height: 450px; overflow-y: auto; }
     .macro-item {
       display: flex;
       justify-content: space-between;
@@ -180,10 +160,12 @@
       border-radius: 10px;
       margin-bottom: 20px;
     }
-    .token-container h3 { font-size: 0.95rem; color: var(--text-main); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .token-container h3 { font-size: 0.95rem; color: var(--text-main); margin-bottom: 10px; }
     .token-save-btn { background: var(--border); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: 0.2s; }
     .token-save-btn:hover { background: var(--text-muted); color: #0b0c10; }
-
+    
+    .success { color: #2ecc71; }
+    .error { color: var(--danger); }
   </style>
 </head>
 <body>
@@ -195,38 +177,14 @@
       <button class="login-btn" id="login-btn">🔑 Owner Login</button>
     </header>
 
-    <!-- Public Community Submit -->
-    <div class="card">
-      <h2>Submit a Macro</h2>
-      <p>Select your Geometry Dash macro file to submit it automatically via GitHub Issues.</p>
-      
-      <div class="drop-zone" id="drop-zone">
-        <p>Click here or drag your macro file</p>
-        <div class="allowed-tags">
-          <span class="tag">.gdr</span>
-          <span class="tag">.gdr2</span>
-          <span class="tag">.echo</span>
-          <span class="tag">.json</span>
-          <span class="tag">.bot</span>
-        </div>
-      </div>
-      
-      <input type="file" id="file-input">
-      <div id="status-msg"></div>
-      
-      <div id="publish-container" style="display: none;">
-        <a id="publish-link" target="_blank" class="action-btn">🚀 Submit File to Robot</a>
-      </div>
-    </div>
-
-    <!-- Owner Panel (Direct Worldwide Publishing - NO LIMITS) -->
+    <!-- Owner Dashboard (Hidden by default, unlocked with password "jaredjfn") -->
     <div class="card" id="admin-panel">
-      <h2>🛠️ Owner Dashboard (Any File Type)</h2>
+      <h2>🛠️ Owner Dashboard (Direct Upload)</h2>
       
       <!-- GITHUB TOKEN MANAGEMENT -->
       <div class="token-container">
         <h3>🔑 GitHub Personal Access Token</h3>
-        <p style="font-size: 0.8rem; margin-bottom: 10px;">Required for Direct Upload and Deleting files bypass.</p>
+        <p style="font-size: 0.8rem; margin-bottom: 10px;">Required to upload any file type and delete files directly.</p>
         <div style="display: flex; gap: 10px;">
           <input type="password" id="gh-token-input" class="search-input" placeholder="ghp_..." style="flex: 1; margin: 0;">
           <button class="token-save-btn" id="save-token-btn">Save Token</button>
@@ -234,14 +192,14 @@
         <div id="token-status" style="margin-top: 8px; font-size: 0.8rem; font-weight: bold;"></div>
       </div>
 
-      <!-- DIRECT UPLOAD -->
+      <!-- DIRECT UPLOAD (ANY FILE) -->
       <p>Select <strong>ANY</strong> file to publish it directly to the site:</p>
       <input type="file" id="owner-file-input" style="margin-bottom:15px; color:var(--text-muted); display:block;">
-      <button class="action-btn" id="owner-upload-btn">⚡ Upload Directly (Bypass Filters)</button>
+      <button class="action-btn" id="owner-upload-btn">⚡ Upload Directly</button>
       <div id="owner-status" style="margin-top:10px; font-weight:bold; font-size:0.9rem;"></div>
     </div>
 
-    <!-- Public List Section -->
+    <!-- Public Live List Section -->
     <div class="card">
       <h2>
         🌍 Live Files 
@@ -267,25 +225,18 @@
 
   <script>
     const USERNAME = "jaredjodin-source"; 
-    const REPO = "jaredjodin-source.github.io";
+    const REPO = "gdmacro.github.io";
     const SECRET_PASS = "jaredjfn";
-    const ALLOWED_EXTENSIONS = ['gdr', 'gdr2', 'echo', 'json', 'bot'];
     
-    // Check local storage for persistent login & token
     let isAdmin = localStorage.getItem('gd_is_logged_in') === 'true';
     let ghToken = localStorage.getItem('gd_gh_token') || '';
     let currentFilter = 'all';
     let fetchedMacros = [];
 
-    const dropZone = document.getElementById('drop-zone');
-    const fileInput = document.getElementById('file-input');
-    const statusMsg = document.getElementById('status-msg');
     const loginBtn = document.getElementById('login-btn');
     const adminBadge = document.getElementById('admin-badge');
     const adminPanel = document.getElementById('admin-panel');
     const macroContainer = document.getElementById('macro-container');
-    const publishContainer = document.getElementById('publish-container');
-    const publishLink = document.getElementById('publish-link');
     const searchBox = document.getElementById('search-box');
     const macroCount = document.getElementById('macro-count');
     
@@ -293,7 +244,6 @@
     const saveTokenBtn = document.getElementById('save-token-btn');
     const tokenStatus = document.getElementById('token-status');
 
-    // Apply initial admin UI state if logged in
     if (isAdmin) {
       adminBadge.style.display = 'inline-block';
       adminPanel.style.display = 'block';
@@ -303,7 +253,6 @@
       }
     }
 
-    // Fetch live files from GitHub "macros/" directory
     async function loadLiveMacros() {
       macroCount.textContent = "Loading...";
       try {
@@ -325,7 +274,6 @@
           fetchedMacros = [];
         }
       } catch (err) {
-        console.error("Error fetching files:", err);
         fetchedMacros = [];
       }
       renderMacros();
@@ -370,7 +318,6 @@
       });
     }
 
-    // Function to delete macro (Owner action)
     window.deleteMacro = async function(fileName, sha) {
       if (!ghToken) {
         alert("⚠️ You need to enter your GitHub Token in the Owner Panel first!");
@@ -403,7 +350,6 @@
       }
     };
 
-    // Owner Login / Logout Toggle
     loginBtn.addEventListener('click', () => {
       if (!isAdmin) {
         const pass = prompt("Enter Owner Password:");
@@ -431,7 +377,6 @@
       }
     });
 
-    // Save Token Button
     saveTokenBtn.addEventListener('click', () => {
       const newToken = ghTokenInput.value.trim();
       if (newToken) {
@@ -446,29 +391,6 @@
       }
     });
 
-    // Public File Upload Proposal (Restricted to Macros)
-    dropZone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => {
-      if (e.target.files.length > 0) {
-        const file = e.target.files[0];
-        const ext = file.name.split('.').pop().toLowerCase();
-        
-        // PUBLIC CHECK: Only allow macros
-        if (ALLOWED_EXTENSIONS.includes(ext)) {
-          statusMsg.className = 'success';
-          statusMsg.textContent = `✅ File "${file.name}" ready!`;
-          const issueUrl = `https://github.com/${USERNAME}/${REPO}/issues/new?title=Macro:+${encodeURIComponent(file.name)}&body=Macro+submission:+${encodeURIComponent(file.name)}`;
-          publishLink.href = issueUrl;
-          publishContainer.style.display = 'block';
-        } else {
-          statusMsg.className = 'error';
-          statusMsg.textContent = `❌ Extension not allowed (.${ext}). Only macros (.gdr, .gdr2, .echo, .json, .bot) are accepted here.`;
-          publishContainer.style.display = 'none';
-        }
-      }
-    });
-
-    // Owner Direct Upload (NO RESTRICTIONS)
     document.getElementById('owner-upload-btn').addEventListener('click', async () => {
       if (!ghToken) {
         alert("⚠️ You need to enter your GitHub Token in the Owner Panel first!");
@@ -483,7 +405,6 @@
         return;
       }
 
-      // NO EXTENSION CHECK FOR OWNER!
       ownerStatus.className = '';
       ownerStatus.style.color = 'var(--accent)';
       ownerStatus.textContent = "⏳ Uploading to GitHub...";
@@ -508,7 +429,7 @@
 
           if (res.ok) {
             ownerStatus.className = 'success';
-            ownerStatus.textContent = `🎉 "${ownerFile.name}" published worldwide!`;
+            ownerStatus.textContent = `🎉 "${ownerFile.name}" published successfully!`;
             document.getElementById('owner-file-input').value = '';
             setTimeout(loadLiveMacros, 1500);
           } else {
