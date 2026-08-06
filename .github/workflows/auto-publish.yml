@@ -49,5 +49,5 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUM: ${{ github.event.issue.number }}
         run: |
-          gh issue close "$ISSUE_NUM" --comment "🎉 Macro validée et publiée !"
+          gh issue close "$ISSUE_NUM" --comment "🎉 Macro validée et publiée !!"
           
