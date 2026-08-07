@@ -177,6 +177,15 @@
       <button class="login-btn" id="login-btn">🔑 Owner Login</button>
     </header>
 
+    <!-- App Download Card (Visible on Web browser, automatically hidden inside the App) -->
+    <div class="card" id="app-download-card">
+      <h2>📱 Get the Official App</h2>
+      <p>Download our Android app for a smoother experience directly on your device.</p>
+      <a href="https://api.nativine.com/download/build_da73710b-3ec5-4d89-badd-ad8fae7c0768.apk?t=1786129836173" class="action-btn" style="background: #2ecc71; color: #0b0c10;" download>
+        📲 Download APK
+      </a>
+    </div>
+
     <!-- Public Request Card -->
     <div class="card">
       <h2>Need a specific macro?</h2>
@@ -238,6 +247,18 @@
   </div>
 
   <script>
+    // --- Automatic App / WebView Detection ---
+    // If the user is inside the Android App, we hide the APK download card
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isWebView = /wv|Nativine/i.test(userAgent) || (window.navigator.userAgent.includes('Android') && window.navigator.userAgent.includes('Version/4.0'));
+
+    if (isWebView) {
+      const appCard = document.getElementById('app-download-card');
+      if (appCard) {
+        appCard.style.display = 'none';
+      }
+    }
+
     const USERNAME = "jaredjodin-source"; 
     const REPO = "gdmacro.github.io";
     const SECRET_PASS = "jaredjfn";
