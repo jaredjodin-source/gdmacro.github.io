@@ -81,6 +81,13 @@
       box-shadow: 0 8px 25px rgba(0,0,0,0.4);
     }
 
+    /* CSS Fallback to hide the download card when running as a standalone app */
+    @media (display-mode: standalone) {
+      #app-download-card {
+        display: none !important;
+      }
+    }
+
     h2 { color: var(--accent); font-size: 1.2rem; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
     p { color: var(--text-muted); margin-bottom: 15px; font-size: 0.95rem; }
 
@@ -177,7 +184,7 @@
       <button class="login-btn" id="login-btn">🔑 Owner Login</button>
     </header>
 
-    <!-- App Download Card (Visible on Web browser, automatically hidden inside the App) -->
+    <!-- App Download Card -->
     <div class="card" id="app-download-card">
       <h2>📱 Get the Official App</h2>
       <p>Download our Android app for a smoother experience directly on your device.</p>
@@ -195,7 +202,7 @@
       </a>
     </div>
 
-    <!-- Owner Dashboard (Hidden by default, unlocked with password "jaredjfn") -->
+    <!-- Owner Dashboard -->
     <div class="card" id="admin-panel">
       <h2>🛠️ Owner Dashboard (Direct Upload)</h2>
       
@@ -216,7 +223,6 @@
       
       <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
       
-      <!-- Quick link button to manage issues -->
       <a href="https://github.com/jaredjodin-source/gdmacro.github.io/issues" target="_blank" class="action-btn" style="background: #f39c12; color: #0b0c10;">
         📁 Manage Issues
       </a>
@@ -247,25 +253,16 @@
   </div>
 
   <script>
-    // --- Automatic App / WebView Detection & Debugging ---
+    // --- Automatic App Detection ---
+    // Checks if the site is running in standalone mode (used by generated APKs) or standard webview
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    const isWebView = /wv|Nativine/i.test(userAgent) || (window.navigator.userAgent.includes('Android') && window.navigator.userAgent.includes('Version/4.0'));
+    const isWebView = /wv|Nativine/i.test(userAgent) || (userAgent.includes('Android') && userAgent.includes('Version/4.0'));
 
     const appCard = document.getElementById('app-download-card');
     
-    if (isWebView) {
-      if (appCard) appCard.style.display = 'none';
-    } else {
-      // If the card doesn't hide, display the User-Agent in red to identify the APK's signature
-      if (appCard) {
-        const debugInfo = document.createElement('p');
-        debugInfo.style.color = '#ff4757';
-        debugInfo.style.fontSize = '0.75rem';
-        debugInfo.style.marginTop = '10px';
-        debugInfo.style.wordBreak = 'break-all';
-        debugInfo.textContent = "🔍 Debug Info: " + userAgent;
-        appCard.appendChild(debugInfo);
-      }
+    if (appCard && (isStandalone || isWebView)) {
+      appCard.style.display = 'none';
     }
 
     const USERNAME = "jaredjodin-source"; 
