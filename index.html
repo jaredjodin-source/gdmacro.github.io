@@ -81,13 +81,6 @@
       box-shadow: 0 8px 25px rgba(0,0,0,0.4);
     }
 
-    /* CSS Fallback to hide the download card when running as a standalone app */
-    @media (display-mode: standalone) {
-      #app-download-card {
-        display: none !important;
-      }
-    }
-
     h2 { color: var(--accent); font-size: 1.2rem; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
     p { color: var(--text-muted); margin-bottom: 15px; font-size: 0.95rem; }
 
@@ -253,15 +246,17 @@
   </div>
 
   <script>
-    // --- Automatic App Detection ---
-    // Checks if the site is running in standalone mode (used by generated APKs) or standard webview
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    // --- Automatic App Detection (Final Fix) ---
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    const isWebView = /wv|Nativine/i.test(userAgent) || (userAgent.includes('Android') && userAgent.includes('Version/4.0'));
+    
+    // Modern mobile browsers (like Chrome) hide the exact device model and "Build/" info for privacy (e.g., they show "Android 10; K").
+    // Android WebViews (used by APK builders like Nativine) still expose the exact Android version and "Build/" string.
+    const isWebView = /wv|Nativine/i.test(userAgent) || (userAgent.includes('Android') && userAgent.includes('Build/'));
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
     const appCard = document.getElementById('app-download-card');
     
-    if (appCard && (isStandalone || isWebView)) {
+    if (appCard && (isWebView || isStandalone)) {
       appCard.style.display = 'none';
     }
 
