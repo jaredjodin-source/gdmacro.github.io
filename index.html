@@ -247,15 +247,24 @@
   </div>
 
   <script>
-    // --- Automatic App / WebView Detection ---
-    // If the user is inside the Android App, we hide the APK download card
+    // --- Automatic App / WebView Detection & Debugging ---
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     const isWebView = /wv|Nativine/i.test(userAgent) || (window.navigator.userAgent.includes('Android') && window.navigator.userAgent.includes('Version/4.0'));
 
+    const appCard = document.getElementById('app-download-card');
+    
     if (isWebView) {
-      const appCard = document.getElementById('app-download-card');
+      if (appCard) appCard.style.display = 'none';
+    } else {
+      // If the card doesn't hide, display the User-Agent in red to identify the APK's signature
       if (appCard) {
-        appCard.style.display = 'none';
+        const debugInfo = document.createElement('p');
+        debugInfo.style.color = '#ff4757';
+        debugInfo.style.fontSize = '0.75rem';
+        debugInfo.style.marginTop = '10px';
+        debugInfo.style.wordBreak = 'break-all';
+        debugInfo.textContent = "🔍 Debug Info: " + userAgent;
+        appCard.appendChild(debugInfo);
       }
     }
 
