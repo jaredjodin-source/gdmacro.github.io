@@ -37,4 +37,3 @@ This application is built with standard web technologies (`HTML5`, `CSS3`, `Java
 1. Clone or download the repository.
 2. Configure your GitHub repository parameters and credentials within the script files.
 3. Deploy effortlessly onto hosting platforms like **Vercel** to enable seamless file uploading and live updates.
-4. 
