@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Site Macros</title>
 
-    <!-- Fichier Manifest pour activer l'option "Installer" (PWA) -->
+    <!-- Fichier Manifest pour la PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0b0e14">
 
@@ -30,13 +30,16 @@
 </head>
 <body>
 
-    <!-- Ce code affiche en plein écran votre site hébergé secrètement sur Vercel -->
     <iframe src="https://jjmacro-github-io.vercel.app/"></iframe>
 
     <script>
-        // Vos variables corrigées avec le nouveau nom de votre dépôt
+        // Enregistrement du Service Worker obligatoire pour Chrome
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
         const USERNAME = "jaredjodin-source";
-        const REPO = "jjmacro"; // Corrigé ici pour remplacer gdmacro.github.io
+        const REPO = "jjmacro";
         const SECRET_PASS = "jaredjfn";
     </script>
 </body>
