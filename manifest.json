@@ -1,7 +1,8 @@
 {
   "name": "GD Macro",
   "short_name": "GDMacro",
-  "start_url": "/",
+  "start_url": "/gdmacro.github.io/",
+  "scope": "/gdmacro.github.io/",
   "display": "standalone",
   "background_color": "#0b0e14",
   "theme_color": "#0b0e14",
