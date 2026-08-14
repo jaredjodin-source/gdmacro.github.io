@@ -1,0 +1,52 @@
+{
+  "author": "JaredJDN",
+  "description": "Converted via GD Macro Vault",
+  "fps": 240,
+  "inputs": [
+    {
+      "frame": 46147,
+      "hold": false,
+      "player2": false
+    },
+    {
+      "frame": 51820,
+      "hold": false,
+      "player2": false
+    },
+    {
+      "frame": 202,
+      "hold": false,
+      "player2": false
+    },
+    {
+      "frame": 53827,
+      "hold": false,
+      "player2": false
+    },
+    {
+      "frame": 53827,
+      "hold": false,
+      "player2": false
+    },
+    {
+      "frame": 53827,
+      "hold": false,
+      "player2": false
+    },
+    {
+      "frame": 51820,
+      "hold": false,
+      "player2": false
+    },
+    {
+      "frame": 17731,
+      "hold": false,
+      "player2": false
+    },
+    {
+      "frame": 202,
+      "hold": false,
+      "player2": false
+    }
+  ]
+}
